@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PDF Viewer</title>
+</head>
+<body>
+    <canvas id="pdf-canvas"></canvas>
+    <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
+    <script>
+        // Načtení PDF.js
+        var pdfjsLib = window['pdfjs-dist/build/pdf'];
+
+        // Zajistěte, aby se worker načítal z CDN
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.js';
+
+        // Cesta k vzorovému PDF souboru
+        var pdfPath = 'cesta_k_vasemu_vzorovemu_pdf.pdf';
+
+        // Načtení dokumentu
+        pdfjsLib.getDocument(pdfPath).promise.then(function(pdfDoc) {
+            console.log('PDF načten');
+
+            // Získání první stránky
+            pdfDoc.getPage(1).then(function(page) {
+                console.log('Stránka 1 načtena');
+
+                var scale = 1.5;
+                var viewport = page.getViewport({scale: scale});
+
+                // Příprava plátna pomocí rozměrů PDF stránky
+                var canvas = document.getElementById('pdf-canvas');
+                var context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                // Renderování PDF stránky
+                var renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                page.render(renderContext).promise.then(function() {
+                    console.log('Stránka vykreslena');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
