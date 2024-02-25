@@ -22,19 +22,19 @@
         #sidebar {
             display: flex;
             flex-direction: column;
+            justify-content: flex-end; /* Zarovnání obsahu na spodní část */
             align-items: center;
             padding: 10px;
             gap: 10px;
             background-color: #f0f0f0;
             box-sizing: border-box;
+            height: 100vh; /* Zajištění, že sidebar zabírá celou výšku */
         }
-        .btn {
+        .btn, #page-controls {
             font-size: 24px;
-        }
-        #page-controls {
+            width: 100%; /* Zajistí, že tlačítka a page-controls zabírají celou šířku sidebaru */
             display: flex;
-            align-items: center;
-            gap: 5px;
+            justify-content: center; /* Vycentrování tlačítek a page-controls horizontálně */
         }
         #current-page {
             width: 40px;
