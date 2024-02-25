@@ -29,10 +29,11 @@
             width: 100%; /* Využívá celou šířku */
         }
         #canvas-container {
-            display: flex; /* Použití flexboxu pro vycentrování obsahu */
-            justify-content: center; /* Vycentrování canvasu horizontálně */
-            align-items: center; /* Vycentrování canvasu vertikálně */
-            height: 100%; /* Využívá celou dostupnou výšku */
+            overflow: auto; /* Umožní posuvník, pokud je obsah větší než kontejner */
+            max-height: 100vh; /* Omezuje maximální výšku na výšku viewportu */
+            width: auto; /* Umožňuje šířku podle obsahu */
+            display: flex; /* Udržuje flexbox pro centrování */
+            justify-content: center; /* Centruje obsah horizontálně */
         }
         .btn {
             font-size: 24px;
@@ -56,7 +57,7 @@
     </div>
     <div id="sidebar">
         <div id="page-controls">
-            <input type="number" id="current-page" value="1"> / <span id="total-pages">0</span>
+            <input type="number" id="current-page" value="1"> / <span id="total-pages"></span>
         </div>
         <button class="btn" id="prev-page" title="Předchozí stránka"><i class="fas fa-arrow-up"></i></button>
         <button class="btn" id="next-page" title="Další stránka"><i class="fas fa-arrow-down"></i></button>
