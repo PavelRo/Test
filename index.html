@@ -35,8 +35,14 @@
         .btn {
             font-size: 24px;
         }
-        input[type="number"] {
-            width: 60px;
+        #page-controls {
+            display: flex;
+            align-items: center; /* Zarovnání prvků ve středu */
+            gap: 5px; /* Vzdálenost mezi prvkami */
+        }
+
+        #current-page {
+            width: 40px; /* Šířka textového pole */
         }
     </style>
 </head>
@@ -47,8 +53,9 @@
         </div>
     </div>
     <div id="sidebar">
-        <input type="number" id="current-page" value="1">
-        <span id="total-pages">/ 0</span>
+        <div id="page-controls">
+            <input type="number" id="current-page" value="1"> / <span id="total-pages">0</span>
+        </div>
         <button class="btn" id="prev-page" title="Předchozí stránka"><i class="fas fa-arrow-up"></i></button>
         <button class="btn" id="next-page" title="Další stránka"><i class="fas fa-arrow-down"></i></button>
         <button class="btn" id="zoom-in" title="Přiblížit"><i class="fas fa-search-plus"></i></button>
