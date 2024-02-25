@@ -80,6 +80,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/build/pdf.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/build/pdf.worker.js';
 
@@ -187,6 +188,17 @@
             pdfDoc = pdfDoc_;
             document.getElementById('total-pages').textContent = pdfDoc.numPages; // Zobrazení celkového počtu stránek
             renderPage(pageNum);
+        });
+        var canvasContainer = document.getElementById('canvas-container');
+        var hammertime = new Hammer(canvasContainer);
+        hammertime.get('pinch').set({ enable: true });
+        
+        hammertime.on('pinchstart pinchmove', function(ev) {
+            if (ev.type === 'pinchstart') {
+                initialScale = scale; // Uložení aktuálního měřítka při začátku škrcení
+            }
+            scale = initialScale * ev.scale; // Upravení měřítka podle gesta škrcení
+            renderPage(pageNum, scale);
         });
     </script>
 </body>
