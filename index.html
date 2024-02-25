@@ -138,6 +138,20 @@
             document.getElementById('total-pages').textContent = pdfDoc.numPages;
             renderPage(pageNum);
         });
+        document.getElementById('pdf-viewer').addEventListener('wheel', function(event) {
+            event.preventDefault(); // Zabrání výchozímu chování prohlížeče
+        
+            var delta = event.deltaY; // Získání směru pohybu kolečka
+        
+            // Přiblížení pro delta < 0, oddálení pro delta > 0
+            if (delta < 0 && scale < 3) { // Maximální hodnota měřítka pro přiblížení
+                scale *= 1.1;
+            } else if (delta > 0 && scale > 0.5) { // Minimální hodnota měřítka pro oddálení
+                scale /= 1.1;
+            }
+        
+            renderPage(pageNum); // Znovunačtení aktuální stránky s upraveným měřítkem
+        }, { passive: false });
     </script>
 </body>
 </html>
