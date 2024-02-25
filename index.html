@@ -142,7 +142,7 @@
 
         pdfjsLib.getDocument(pdfPath).promise.then(function(pdfDoc_) {
             pdfDoc = pdfDoc_;
-            document.getElementById('total-pages').textContent = 'Celkem stránek: ' + pdfDoc.numPages;
+            document.getElementById('total-pages').textContent = pdfDoc.numPages;
             renderPage(pageNum);
         });
     </script>
