@@ -1,19 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PDF Viewer with Zoom and Fullscreen</title>
+    <title>PDF Viewer with Sidebar Controls</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #sidebar {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            gap: 10px;
+            height: 100%;
+            background-color: #f0f0f0;
+        }
+        #pdf-viewer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+        }
+        #canvas-container {
+            overflow: auto;
+            max-width: 80%;
+            max-height: 100%;
+        }
+    </style>
 </head>
 <body>
-    <div>
+    <div id="pdf-viewer">
+        <div id="canvas-container">
+            <canvas id="pdf-canvas"></canvas>
+        </div>
+    </div>
+    <div id="sidebar">
         <button id="prev-page">Předchozí stránka</button>
         <button id="next-page">Další stránka</button>
         <button id="zoom-in">Přiblížit</button>
         <button id="zoom-out">Oddálit</button>
         <button id="enter-fullscreen">Celá obrazovka</button>
         <span id="page-info">Strana</span>
-    </div>
-    <div id="canvas-container">
-        <canvas id="pdf-canvas"></canvas>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/build/pdf.js"></script>
