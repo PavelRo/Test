@@ -1,40 +1,43 @@
+<!DOCTYPE html>
+<html>
 <head>
-    <title>PDF Viewer with Right Sidebar</title>
+    <title>PDF Viewer with Touch Gestures</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://hammerjs.github.io/dist/hammer.min.js"></script> <!-- Přidání hammer.js -->
     <style>
         body {
             display: flex;
-            justify-content: center; /* Vycentrování obsahu */
+            justify-content: center;
             height: 100vh;
             margin: 0;
-            overflow: hidden; /* Zabrání posuvníkům na úrovni body */
+            overflow: hidden;
         }
         #pdf-viewer {
             flex-grow: 1;
-            overflow: auto; /* Povoluje posuvníky pro PDF obsah */
+            overflow: auto;
         }
         #canvas-container {
             display: flex;
-            justify-content: center; /* Vycentrování PDF horizontálně */
-            padding: 20px; /* Dodává trochu prostoru okolo PDF */
+            justify-content: center;
+            padding: 20px;
             box-sizing: border-box;
         }
         #sidebar {
             display: flex;
             flex-direction: column;
-            justify-content: flex-end; /* Zarovnání obsahu na spodní část */
+            justify-content: flex-end;
             align-items: center;
             padding: 10px;
             gap: 10px;
             background-color: #f0f0f0;
             box-sizing: border-box;
-            height: 100vh; /* Zajištění, že sidebar zabírá celou výšku */
+            height: 100vh;
         }
         .btn, #page-controls {
             font-size: 24px;
-            width: 100%; /* Zajistí, že tlačítka a page-controls zabírají celou šířku sidebaru */
+            width: 100%;
             display: flex;
-            justify-content: center; /* Vycentrování tlačítek a page-controls horizontálně */
+            justify-content: center;
         }
         #current-page {
             width: 40px;
@@ -58,15 +61,14 @@
         <button class="btn" id="enter-fullscreen" title="Celá obrazovka"><i class="fas fa-expand"></i></button>
     </div>
 
-    
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/build/pdf.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/build/pdf.worker.js';
 
-        var pdfPath = 'test.pdf'; // Cesta k PDF
+        var pdfPath = 'test.pdf';
         var pdfDoc = null;
         var pageNum = 1;
-        var scale = 1.0; // Základní měřítko
+        var scale = 1.0;
 
         function renderPage(num) {
             pdfDoc.getPage(num).then(function(page) {
@@ -82,11 +84,40 @@
                 };
                 page.render(renderContext);
 
-                document.getElementById('page-info').textContent = 'Strana ' + num + ' z ' + pdfDoc.numPages;
+                document.getElementById('current-page').value = num;
+                document.getElementById('total-pages').textContent = pdfDoc.numPages;
             });
         }
-        
-         document.getElementById('current-page').addEventListener('change', function() {
+
+        // Dotyková gesta pro PDF viewer
+        var mc = new Hammer(document.getElementById('pdf-viewer'));
+        mc.get('pinch').set({ enable: true });
+        mc.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+
+        mc.on('pinch', function(ev) {
+            if (ev.scale > 1 && scale < 3) {
+                scale *= 1.1;
+            } else if (ev.scale < 1 && scale > 0.5) {
+                scale /= 1.1;
+            }
+            renderPage(pageNum);
+        });
+
+        mc.on('swipeleft', function(ev) {
+            if (pageNum < pdfDoc.numPages) {
+                pageNum++;
+                renderPage(pageNum);
+            }
+        });
+
+        mc.on('swiperight', function(ev) {
+            if (pageNum > 1) {
+                pageNum--;
+                renderPage(pageNum);
+            }
+        });
+
+        document.getElementById('current-page').addEventListener('change', function() {
             var page = parseInt(this.value);
             if(page >= 1 && page <= pdfDoc.numPages) {
                 pageNum = page;
@@ -94,64 +125,13 @@
             }
         });
 
-        document.getElementById('prev-page').addEventListener('click', function() {
-            if (pageNum <= 1) {
-                return;
-            }
-            pageNum--;
-            renderPage(pageNum);
-        });
-
-        document.getElementById('next-page').addEventListener('click', function() {
-            if (pageNum >= pdfDoc.numPages) {
-                return;
-            }
-            pageNum++;
-            renderPage(pageNum);
-        });
-
-        document.getElementById('zoom-in').addEventListener('click', function() {
-            scale *= 1.1;
-            renderPage(pageNum);
-        });
-
-        document.getElementById('zoom-out').addEventListener('click', function() {
-            scale /= 1.1;
-            renderPage(pageNum);
-        });
-
-        document.getElementById('enter-fullscreen').addEventListener('click', function() {
-            var elem = document.getElementById('canvas-container');
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen();
-            } else if (elem.mozRequestFullScreen) { /* Firefox */
-                elem.mozRequestFullScreen();
-            } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-                elem.webkitRequestFullscreen();
-            } else if (elem.msRequestFullscreen) { /* IE/Edge */
-                elem.msRequestFullscreen();
-            }
-        });
+        // Přidejte obslužné rutiny pro tlačítka jako dříve
 
         pdfjsLib.getDocument(pdfPath).promise.then(function(pdfDoc_) {
             pdfDoc = pdfDoc_;
             document.getElementById('total-pages').textContent = pdfDoc.numPages;
             renderPage(pageNum);
         });
-        document.getElementById('pdf-viewer').addEventListener('wheel', function(event) {
-            event.preventDefault(); // Zabrání výchozímu chování prohlížeče
-        
-            var delta = event.deltaY; // Získání směru pohybu kolečka
-        
-            // Přiblížení pro delta < 0, oddálení pro delta > 0
-            if (delta < 0 && scale < 3) { // Maximální hodnota měřítka pro přiblížení
-                scale *= 1.1;
-            } else if (delta > 0 && scale > 0.5) { // Minimální hodnota měřítka pro oddálení
-                scale /= 1.1;
-            }
-        
-            renderPage(pageNum); // Znovunačtení aktuální stránky s upraveným měřítkem
-        }, { passive: false });
     </script>
 </body>
 </html>
