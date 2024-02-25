@@ -107,6 +107,7 @@
         }
 
         document.getElementById('file-input').addEventListener('change', function(e) {
+            pageNum = 1;
             var file = e.target.files[0];
             if (file.type === 'application/pdf') {
                 var fileReader = new FileReader();
@@ -123,8 +124,6 @@
             } else {
                 alert('Prosím, vyberte PDF soubor.');
             }
-            
-
         });
         
         document.getElementById('current-page').addEventListener('change', function() {
