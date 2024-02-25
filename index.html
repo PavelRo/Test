@@ -44,6 +44,12 @@
     </style>
 </head>
 <body>
+    <div id="left-sidebar">
+        <label for="file-input" class="btn" title="Nahrát PDF">
+            <i class="fas fa-file-upload"></i>
+        </label>
+        <input type="file" id="file-input" class="file-input" accept="application/pdf"/>
+    </div>
     <div id="pdf-viewer">
         <div id="canvas-container">
             <canvas id="pdf-canvas"></canvas>
@@ -70,9 +76,8 @@
         var pageNum = 1;
         var scale = 1.0; // Základní měřítko
 
-        function renderPage(num, customScale = scale) {
+         function renderPage(num, customScale = scale) {
             pdfDoc.getPage(num).then(function(page) {
-                // Oprava: nejprve vyřešit Promise a pak použít výsledek
                 var viewport = page.getViewport({ scale: customScale });
                 var canvas = document.getElementById('pdf-canvas');
                 var ctx = canvas.getContext('2d');
@@ -85,10 +90,28 @@
                 };
                 page.render(renderContext);
 
-                document.getElementById('current-page').value = num; // Aktualizace zobrazení aktuální stránky
-                document.getElementById('total-pages').textContent = pdfDoc.numPages; // Aktualizace celkového počtu stránek
+                document.getElementById('current-page').value = num;
+                document.getElementById('total-pages').textContent = pdfDoc.numPages;
             });
         }
+
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (file.type === 'application/pdf') {
+                var fileReader = new FileReader();
+                fileReader.onload = function() {
+                    var typedarray = new Uint8Array(this.result);
+                    pdfjsLib.getDocument({data: typedarray}).promise.then(function(pdfDoc_) {
+                        pdfDoc = pdfDoc_;
+                        document.getElementById('total-pages').textContent = pdfDoc.numPages;
+                        renderPage(pageNum);
+                    });
+                };
+                fileReader.readAsArrayBuffer(file);
+            } else {
+                alert('Prosím, vyberte PDF soubor.');
+            }
+        });
         
         document.getElementById('current-page').addEventListener('change', function() {
             var page = parseInt(this.value);
