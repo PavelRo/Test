@@ -1,7 +1,5 @@
-<!DOCTYPE html>
-<html>
 <head>
-    <title>PDF Viewer with Icons and Bottom-aligned Controls</title>
+    <title>PDF Viewer with Icons and Page Count</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
@@ -9,6 +7,7 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden; /* Zabránění zobrazení posuvníku */
         }
         #sidebar {
             display: flex;
@@ -25,6 +24,7 @@
             justify-content: center;
             align-items: center;
             flex-grow: 1;
+            overflow: hidden; /* Zabránění zobrazení posuvníku */
         }
         #canvas-container {
             overflow: auto;
@@ -43,13 +43,14 @@
         </div>
     </div>
     <div id="sidebar">
+        <div id="total-pages">Celkem stránek: </div> <!-- Zobrazení celkového počtu stránek -->
         <button class="btn" id="prev-page" title="Předchozí stránka"><i class="fas fa-arrow-up"></i></button>
         <button class="btn" id="next-page" title="Další stránka"><i class="fas fa-arrow-down"></i></button>
         <button class="btn" id="zoom-in" title="Přiblížit"><i class="fas fa-search-plus"></i></button>
         <button class="btn" id="zoom-out" title="Oddálit"><i class="fas fa-search-minus"></i></button>
         <button class="btn" id="enter-fullscreen" title="Celá obrazovka"><i class="fas fa-expand"></i></button>
     </div>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/build/pdf.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/build/pdf.worker.js';
