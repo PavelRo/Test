@@ -118,7 +118,15 @@
                         pdfDoc = pdfDoc_;
                         document.getElementById('top-bar').textContent = file.name; // Zobrazí název nahraného dokumentu
                         document.getElementById('total-pages').textContent = pdfDoc.numPages;
-                        renderPage(pageNum);
+                        pdfDoc.getPage(1).then(function(page) {
+                            var viewport = page.getViewport({ scale: 1 });
+                            var containerWidth = document.getElementById('pdf-viewer').offsetWidth;
+                            var scaleToFit = containerWidth / viewport.width;
+                            scale = scaleToFit; // Nastavení měřítka na scaleToFit
+                            
+                            document.getElementById('total-pages').textContent = pdfDoc.numPages;
+                            renderPage(pageNum, scaleToFit); // Zobrazení první stránky s vypočítaným měřítkem
+                        });
                     });
                 };
                 fileReader.readAsArrayBuffer(file);
