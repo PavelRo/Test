@@ -4,7 +4,9 @@
     <style>
         body {
             display: flex;
-            justify-content: center;
+            flex-direction: column; /* Změna na sloupcové rozložení */
+            justify-content: center; /* Vycentrování obsahu vertikálně */
+            align-items: center; /* Vycentrování obsahu horizontálně */
             height: 100vh;
             margin: 0;
             overflow: hidden; /* Zabrání posuvníkům */
@@ -21,16 +23,16 @@
         }
         #pdf-viewer {
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: center; /* Vycentrování canvasu horizontálně */
+            align-items: center; /* Vycentrování canvasu vertikálně */
             flex-grow: 1;
             width: 100%; /* Využívá celou šířku */
         }
         #canvas-container {
-            overflow: auto;
-            width: 100%; /* Využívá celou dostupnou šířku */
-            max-width: none; /* Odstranění maximální šířky */
-            box-sizing: border-box; /* Správný výpočet výšky s paddingem */
+            display: flex; /* Použití flexboxu pro vycentrování obsahu */
+            justify-content: center; /* Vycentrování canvasu horizontálně */
+            align-items: center; /* Vycentrování canvasu vertikálně */
+            height: 100%; /* Využívá celou dostupnou výšku */
         }
         .btn {
             font-size: 24px;
