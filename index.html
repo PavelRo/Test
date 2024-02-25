@@ -4,44 +4,83 @@
     <title>PDF Viewer</title>
 </head>
 <body>
-    <button id="prev-page">Předchozí strana</button>
-    <button id="next-page">Další strana</button>
+    <div>
+        <button id="prev-page">Předchozí stránka</button>
+        <span id="page-info">Strana</span>
+        <button id="next-page">Další stránka</button>
+    </div>
     <canvas id="pdf-canvas"></canvas>
+
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/build/pdf.js"></script>
     <script>
-        // Načtení PDF.js hahaha
-        // Zajistěte, aby se worker načítal z CDN
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/build/pdf.worker.js';
 
-        // Cesta k vzorovému PDF souboru
         var pdfPath = 'test.pdf';
+        var pdfDoc = null;
+        var pageNum = 1;
+        var pageIsRendering = false;
+        var pageNumIsPending = null;
 
-        // Načtení dokumentu
-        pdfjsLib.getDocument(pdfPath).promise.then(function(pdfDoc) {
-            console.log('PDF načten');
+        function renderPage(num) {
+            pageIsRendering = true;
 
-            // Získání první stránky
-            pdfDoc.getPage(1).then(function(page) {
-                console.log('Stránka 1 načtena');
-
+            // Získání stránky
+            pdfDoc.getPage(num).then(function(page) {
                 var scale = 1.5;
                 var viewport = page.getViewport({scale: scale});
-
-                // Příprava plátna pomocí rozměrů PDF stránky
                 var canvas = document.getElementById('pdf-canvas');
-                var context = canvas.getContext('2d');
+                var ctx = canvas.getContext('2d');
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
 
-                // Renderování PDF stránky
-                var renderContext = {
-                    canvasContext: context,
-                    viewport: viewport
-                };
-                page.render(renderContext).promise.then(function() {
-                    console.log('Stránka vykreslena');
+                var renderCtx = {canvasContext: ctx, viewport: viewport};
+                page.render(renderCtx).promise.then(function() {
+                    pageIsRendering = false;
+
+                    if (pageNumIsPending !== null) {
+                        renderPage(pageNumIsPending);
+                        pageNumIsPending = null;
+                    }
                 });
+
+                // Zobrazení čísla stránky
+                document.getElementById('page-info').textContent = 'Strana ' + num + ' z ' + pdfDoc.numPages;
             });
+        }
+
+        // Kontrola, zda je stránka ve vykreslování
+        function queueRenderPage(num) {
+            if (pageIsRendering) {
+                pageNumIsPending = num;
+            } else {
+                renderPage(num);
+            }
+        }
+
+        // Zobrazení předchozí stránky
+        function onPrevPage() {
+            if (pageNum <= 1) {
+                return;
+            }
+            pageNum--;
+            queueRenderPage(pageNum);
+        }
+        document.getElementById('prev-page').addEventListener('click', onPrevPage);
+
+        // Zobrazení další stránky
+        function onNextPage() {
+            if (pageNum >= pdfDoc.numPages) {
+                return;
+            }
+            pageNum++;
+            queueRenderPage(pageNum);
+        }
+        document.getElementById('next-page').addEventListener('click', onNextPage);
+
+        // Načtení dokumentu
+        pdfjsLib.getDocument(pdfPath).promise.then(function(pdfDoc_) {
+            pdfDoc = pdfDoc_;
+            renderPage(pageNum);
         });
     </script>
 </body>
