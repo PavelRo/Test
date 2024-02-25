@@ -8,8 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/build/pdf.js"></script>
     <script>
         // Načtení PDF.js
-        var { pdfjsLib } = globalThis;
-
         // Zajistěte, aby se worker načítal z CDN
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/build/pdf.worker.js';
 
