@@ -24,11 +24,12 @@
             justify-content: center;
             align-items: center;
             flex-grow: 1;
+            width: 100%; /* Využívá celou šířku */
         }
         #canvas-container {
             overflow: auto;
-            max-width: 80%;
-            max-height: 100%;
+            width: 100%; /* Využívá celou dostupnou šířku */
+            max-width: none; /* Odstranění maximální šířky */
             box-sizing: border-box; /* Správný výpočet výšky s paddingem */
         }
         .btn {
