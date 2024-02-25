@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PDF Viewer with Fullscreen</title>
+    <title>PDF Viewer with Zoom and Fullscreen</title>
 </head>
 <body>
     <div>
@@ -20,33 +20,57 @@
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/build/pdf.worker.js';
 
-        var pdfPath = 'test.pdf';
+        var pdfPath = 'test.pdf'; // Cesta k PDF
         var pdfDoc = null;
         var pageNum = 1;
         var scale = 1.0; // Základní měřítko
 
-        function renderPage(num, scale) {
+        function renderPage(num) {
             pdfDoc.getPage(num).then(function(page) {
                 var viewport = page.getViewport({scale: scale});
                 var canvas = document.getElementById('pdf-canvas');
-                var context = canvas.getContext('2d');
+                var ctx = canvas.getContext('2d');
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
 
                 var renderContext = {
-                    canvasContext: context,
+                    canvasContext: ctx,
                     viewport: viewport
                 };
                 page.render(renderContext);
 
-                // Zobrazení čísla stránky
                 document.getElementById('page-info').textContent = 'Strana ' + num + ' z ' + pdfDoc.numPages;
             });
         }
 
+        document.getElementById('prev-page').addEventListener('click', function() {
+            if (pageNum <= 1) {
+                return;
+            }
+            pageNum--;
+            renderPage(pageNum);
+        });
+
+        document.getElementById('next-page').addEventListener('click', function() {
+            if (pageNum >= pdfDoc.numPages) {
+                return;
+            }
+            pageNum++;
+            renderPage(pageNum);
+        });
+
+        document.getElementById('zoom-in').addEventListener('click', function() {
+            scale *= 1.1;
+            renderPage(pageNum);
+        });
+
+        document.getElementById('zoom-out').addEventListener('click', function() {
+            scale /= 1.1;
+            renderPage(pageNum);
+        });
+
         document.getElementById('enter-fullscreen').addEventListener('click', function() {
             var elem = document.getElementById('canvas-container');
-
             if (elem.requestFullscreen) {
                 elem.requestFullscreen();
             } else if (elem.mozRequestFullScreen) { /* Firefox */
@@ -58,12 +82,9 @@
             }
         });
 
-        // Zde přidejte další obslužné rutiny pro navigační a zoomovací tlačítka...
-
-        // Načtení dokumentu
         pdfjsLib.getDocument(pdfPath).promise.then(function(pdfDoc_) {
             pdfDoc = pdfDoc_;
-            renderPage(pageNum, scale);
+            renderPage(pageNum);
         });
     </script>
 </body>
