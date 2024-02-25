@@ -1,24 +1,22 @@
-<!DOCTYPE html>
-<html>
 <head>
-    <title>PDF Viewer with Touch Support for iPad</title>
+    <title>PDF Viewer with Right Sidebar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
             display: flex;
-            justify-content: center;
+            justify-content: center; /* Vycentrování obsahu */
             height: 100vh;
             margin: 0;
-            overflow: hidden;
+            overflow: hidden; /* Zabrání posuvníkům na úrovni body */
         }
         #pdf-viewer {
             flex-grow: 1;
-            overflow: auto;
+            overflow: auto; /* Povoluje posuvníky pro PDF obsah */
         }
         #canvas-container {
             display: flex;
-            justify-content: center;
-            padding: 20px;
+            justify-content: center; /* Vycentrování PDF horizontálně */
+            padding: 20px; /* Dodává trochu prostoru okolo PDF */
             box-sizing: border-box;
         }
         #sidebar {
@@ -29,7 +27,6 @@
             gap: 10px;
             background-color: #f0f0f0;
             box-sizing: border-box;
-            height: 100vh;
         }
         .btn {
             font-size: 24px;
@@ -61,6 +58,7 @@
         <button class="btn" id="enter-fullscreen" title="Celá obrazovka"><i class="fas fa-expand"></i></button>
     </div>
 
+    
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/build/pdf.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/build/pdf.worker.js';
@@ -68,7 +66,7 @@
         var pdfPath = 'test.pdf'; // Cesta k PDF
         var pdfDoc = null;
         var pageNum = 1;
-        var scale = 1.0;
+        var scale = 1.0; // Základní měřítko
 
         function renderPage(num) {
             pdfDoc.getPage(num).then(function(page) {
@@ -84,45 +82,56 @@
                 };
                 page.render(renderContext);
 
-                document.getElementById('current-page').value = num;
-                document.getElementById('total-pages').textContent = pdfDoc.numPages;
+                document.getElementById('page-info').textContent = 'Strana ' + num + ' z ' + pdfDoc.numPages;
             });
         }
-
-        // Implementace dotykových událostí pro iPad/Safari
-        let startTouches = null;
-        document.getElementById('pdf-viewer').addEventListener('touchstart', function(event) {
-            if (event.touches.length == 2) { // Uložení počátečních pozic pro gesto dvou prstů
-                startTouches = event.touches;
+        
+         document.getElementById('current-page').addEventListener('change', function() {
+            var page = parseInt(this.value);
+            if(page >= 1 && page <= pdfDoc.numPages) {
+                pageNum = page;
+                renderPage(pageNum);
             }
-        }, false);
+        });
 
-        document.getElementById('pdf-viewer').addEventListener('touchmove', function(event) {
-            if (event.touches.length == 2 && startTouches) { // Detekce gesta škrcení/roztažení dvěma prsty
-                event.preventDefault(); // Zabránění výchozímu chování prohlížeče
-                let endTouches = event.touches;
-                let startDistance = Math.hypot(startTouches[0].pageX - startTouches[1].pageX, startTouches[0].pageY - startTouches[1].pageY);
-                let endDistance = Math.hypot(endTouches[0].pageX - endTouches[1].pageX, endTouches[0].pageY - endTouches[1].pageY);
-                let distanceRatio = endDistance / startDistance;
-
-                if (distanceRatio > 1.05) { // Přiblížení
-                    scale *= 1.05;
-                    renderPage(pageNum);
-                } else if (distanceRatio < 0.95) { // Oddálení
-                    scale /= 1.05;
-                    renderPage(pageNum);
-                }
-
-                startTouches = endTouches; // Aktualizace počátečních pozic pro kontinuální gesta
+        document.getElementById('prev-page').addEventListener('click', function() {
+            if (pageNum <= 1) {
+                return;
             }
-        }, false);
+            pageNum--;
+            renderPage(pageNum);
+        });
 
-        document.getElementById('pdf-viewer').addEventListener('touchend', function(event) {
-            startTouches = null; // Reset počátečních pozic po ukončení gesta
-        }, false);
+        document.getElementById('next-page').addEventListener('click', function() {
+            if (pageNum >= pdfDoc.numPages) {
+                return;
+            }
+            pageNum++;
+            renderPage(pageNum);
+        });
 
-        // Ostatní ovládací prvky jako dříve
-        // Přidejte obslužné rutiny pro tlačítka, změnu stránek atd.
+        document.getElementById('zoom-in').addEventListener('click', function() {
+            scale *= 1.1;
+            renderPage(pageNum);
+        });
+
+        document.getElementById('zoom-out').addEventListener('click', function() {
+            scale /= 1.1;
+            renderPage(pageNum);
+        });
+
+        document.getElementById('enter-fullscreen').addEventListener('click', function() {
+            var elem = document.getElementById('canvas-container');
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) { /* Firefox */
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE/Edge */
+                elem.msRequestFullscreen();
+            }
+        });
 
         pdfjsLib.getDocument(pdfPath).promise.then(function(pdfDoc_) {
             pdfDoc = pdfDoc_;
