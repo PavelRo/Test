@@ -47,7 +47,7 @@
             display: none; /* Skryje skutečný vstupní prvek souboru */
         }
         #current-page {
-            width: 40px;
+            width: 20px;
         }
     </style>
 </head>
@@ -123,13 +123,6 @@
                 alert('Prosím, vyberte PDF soubor.');
             }
             
-            var containerWidth = document.getElementById('pdf-viewer').offsetWidth;
-            pdfDoc.getPage(pageNum).then(function(page) {
-                var viewport = page.getViewport({ scale: 1 });
-                var scaleToFit = containerWidth / viewport.width;
-                scale = scaleToFit;
-                renderPage(pageNum, scaleToFit);
-            });
 
         });
         
