@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html>
 <head>
     <title>PDF Viewer with Right Sidebar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -56,9 +58,9 @@
         <button class="btn" id="zoom-in" title="Přiblížit"><i class="fas fa-search-plus"></i></button>
         <button class="btn" id="zoom-out" title="Oddálit"><i class="fas fa-search-minus"></i></button>
         <button class="btn" id="enter-fullscreen" title="Celá obrazovka"><i class="fas fa-expand"></i></button>
+        <button class="btn" id="fit-width" title="Rozšířit na šířku stránky"><i class="fas fa-arrows-alt-h"></i></button> <!-- Nové tlačítko pro rozšíření na šířku stránky -->
     </div>
 
-    
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/build/pdf.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.12.313/build/pdf.worker.js';
@@ -68,9 +70,9 @@
         var pageNum = 1;
         var scale = 1.0; // Základní měřítko
 
-        function renderPage(num) {
+        function renderPage(num, customScale = scale) {
             pdfDoc.getPage(num).then(function(page) {
-                var viewport = page.getViewport({scale: scale});
+                var viewport = page.getViewport({scale: customScale});
                 var canvas = document.getElementById('pdf-canvas');
                 var ctx = canvas.getContext('2d');
                 canvas.height = viewport.height;
@@ -82,11 +84,11 @@
                 };
                 page.render(renderContext);
 
-                document.getElementById('page-info').textContent = 'Strana ' + num + ' z ' + pdfDoc.numPages;
+                document.getElementById('current-page').value = num; // Aktualizace zobrazení aktuální stránky
             });
         }
         
-         document.getElementById('current-page').addEventListener('change', function() {
+        document.getElementById('current-page').addEventListener('change', function() {
             var page = parseInt(this.value);
             if(page >= 1 && page <= pdfDoc.numPages) {
                 pageNum = page;
@@ -133,9 +135,16 @@
             }
         });
 
+        document.getElementById('fit-width').addEventListener('click', function() {
+            var containerWidth = document.getElementById('pdf-viewer').offsetWidth;
+            var viewport = pdfDoc.getPage(pageNum).getViewport({scale: 1});
+            var scaleToFit = containerWidth / viewport.width;
+            renderPage(pageNum, scaleToFit);
+        });
+
         pdfjsLib.getDocument(pdfPath).promise.then(function(pdfDoc_) {
             pdfDoc = pdfDoc_;
-            document.getElementById('total-pages').textContent = pdfDoc.numPages;
+            document.getElementById('total-pages').textContent = pdfDoc.numPages; // Zobrazení celkového počtu stránek
             renderPage(pageNum);
         });
     </script>
